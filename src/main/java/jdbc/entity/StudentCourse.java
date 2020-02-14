@@ -2,7 +2,7 @@ package jdbc.entity;
 
 import java.util.Objects;
 
-public class Student_Course {
+public class StudentCourse {
     private int id;
     private int student_id;
     private int course_id;
@@ -35,7 +35,7 @@ public class Student_Course {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Student_Course that = (Student_Course) o;
+        StudentCourse that = (StudentCourse) o;
         return id == that.id &&
                 student_id == that.student_id &&
                 course_id == that.course_id;
@@ -48,7 +48,7 @@ public class Student_Course {
 
     @Override
     public String toString() {
-        return "Student_Course{" +
+        return "StudentCourse{" +
                 "jdbc.bl=" + id +
                 ", student_id=" + student_id +
                 ", course_id=" + course_id +

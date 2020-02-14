@@ -42,7 +42,7 @@ public class Teacher {
     @Override
     public String toString() {
         return "Teacher{" +
-                "jdbc.bl=" + id +
+                "id=" + id +
                 ", name='" + name + '\'' +
                 '}';
     }

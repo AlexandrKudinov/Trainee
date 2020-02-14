@@ -15,19 +15,14 @@ public class StudentService extends Util implements StudentDAO {
 
     @Override
     public void add(Student student) throws SQLException {
-        PreparedStatement preparedStatement = null;
         String sql = "INSERT INTO students ( id, name ) VALUES ( ?, ?);";
-        try {
-            preparedStatement = connection.prepareStatement(sql);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, student.getId());
             preparedStatement.setString(2, student.getName());
-           // preparedStatement.executeUpdate();
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (preparedStatement != null) {
-                preparedStatement.close();
-            }
             if (connection != null) {
                 connection.close();
             }
@@ -35,36 +30,36 @@ public class StudentService extends Util implements StudentDAO {
     }
 
 
-    public List<Student> getAllWhichHaveAtListOneCourseOf(Teacher teacher) throws SQLException {
-        PreparedStatement preparedStatement = null;
-        String sql = "SELECT DISTINCT students FROM students INNER JOIN students_courses on students.id = students_courses.student_id INNET JOIN courses ON courses.id = students_courses.course_id WHERE courses.teacher_id = ?;";
-        List<Student> students = new ArrayList<>();
-        //  Statement statement = null;
+    private void addStudentToList(ResultSet resultSet, List<Student> students) throws SQLException {
+        while (resultSet.next()) {
+            Student student = new Student();
+            student.setId(resultSet.getInt("id"));
+            student.setName(resultSet.getString("name"));
+            students.add(student);
+        }
+    }
 
-        try {
-            preparedStatement = connection.prepareStatement(sql);
+    public List<String> getAllTeachedBy(Teacher teacher) throws SQLException {
+        String sql = "SELECT DISTINCT students.name FROM students " +
+                "INNER JOIN students_courses on students.id = students_courses.student_id "+
+                "INNER JOIN courses ON courses.id = students_courses.course_id WHERE courses.teacher_id = ?;";
+        List<String> students = new ArrayList<>();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, teacher.getId());
-//            statement = connection.createStatement();
             ResultSet resultSet = preparedStatement.executeQuery();
-
             while (resultSet.next()) {
-                Student student = new Student();
-                student.setId(resultSet.getInt("id"));
-                student.setName(resultSet.getString("name"));
-                students.add(student);
+               String name = resultSet.getString("name");
+                students.add(name);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (preparedStatement != null) {
-                preparedStatement.close();
-            }
             if (connection != null) {
                 connection.close();
             }
         }
         return students;
-
     }
 
 
@@ -72,23 +67,12 @@ public class StudentService extends Util implements StudentDAO {
     public List<Student> getALL() throws SQLException {
         List<Student> students = new ArrayList<>();
         String sql = "SELECT id, name FROM students;";
-        Statement statement = null;
-        try {
-            statement = connection.createStatement();
+        try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
-
-            while (resultSet.next()) {
-                Student student = new Student();
-                student.setId(resultSet.getInt("id"));
-                student.setName(resultSet.getString("name"));
-                students.add(student);
-            }
+            addStudentToList(resultSet, students);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (statement != null) {
-                statement.close();
-            }
             if (connection != null) {
                 connection.close();
             }
@@ -96,27 +80,23 @@ public class StudentService extends Util implements StudentDAO {
         return students;
     }
 
+
     @Override
     public Student getByID(int id) throws SQLException {
         Student student = new Student();
-        PreparedStatement preparedStatement = null;
         String sql = "SELECT id, name FROM students WHERE id=?;";
 
-        try {
-            preparedStatement = connection.prepareStatement(sql);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-
-            student.setId(resultSet.getInt("id"));
-            student.setName(resultSet.getString("name"));
-           // preparedStatement.executeUpdate();
+            if (resultSet.next()) {
+                student.setId(resultSet.getInt("id"));
+                student.setName(resultSet.getString("name"));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (preparedStatement != null) {
-                preparedStatement.close();
-            }
             if (connection != null) {
                 connection.close();
             }
@@ -127,18 +107,13 @@ public class StudentService extends Util implements StudentDAO {
     @Override
     public void update(Student student) throws SQLException {
         String sql = "UPDATE students SET name=? WHERE id=?;";
-        PreparedStatement preparedStatement = null;
-        try {
-            preparedStatement = connection.prepareStatement(sql);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, student.getName());
             preparedStatement.setInt(2, student.getId());
-            preparedStatement.executeQuery();
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (preparedStatement != null) {
-                preparedStatement.close();
-            }
             if (connection != null) {
                 connection.close();
             }
@@ -147,18 +122,13 @@ public class StudentService extends Util implements StudentDAO {
 
     @Override
     public void remove(Student student) throws SQLException {
-        PreparedStatement preparedStatement = null;
         String sql = "DELETE FROM students WHERE id=?;";
-        try {
-            preparedStatement = connection.prepareStatement(sql);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, student.getId());
-           // preparedStatement.executeUpdate();
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (preparedStatement != null) {
-                preparedStatement.close();
-            }
             if (connection != null) {
                 connection.close();
             }

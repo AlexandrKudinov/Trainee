@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class TeacherService extends Util implements TeacherDAO {
-    Connection connection = getConnection();
+    final Connection connection = getConnection();
 
     @Override
     public void add(Teacher teacher) {
@@ -26,26 +26,21 @@ public class TeacherService extends Util implements TeacherDAO {
     @Override
     public Teacher getByID(int id) throws SQLException {
         Teacher teacher = new Teacher();
-        PreparedStatement preparedStatement = null;
-        String sql = "SELECT id, name FROM teachers WHERE id=?;";
-
-        try {
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            teacher.setId(resultSet.getInt("id"));
-            teacher.setName(resultSet.getString("name"));
-            //preparedStatement.executeQuery();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (preparedStatement != null) {
-                preparedStatement.close();
-            }
-            if (connection != null) {
-                connection.close();
-            }
-        }
+//        String sql = "SELECT id, name FROM teachers WHERE id=?;";
+//
+//        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+//            preparedStatement.setInt(1, id);
+//            ResultSet resultSet = preparedStatement.executeQuery();
+//            teacher.setId(resultSet.getInt("id"));
+//            teacher.setName(resultSet.getString("name"));
+//            //preparedStatement.executeQuery();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        } finally {
+//            if (connection != null) {
+//                connection.close();
+//            }
+//        }
         return teacher;
     }
 
