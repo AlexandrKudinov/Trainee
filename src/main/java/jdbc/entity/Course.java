@@ -44,8 +44,8 @@ public class Course {
         this.endDatetime = end_datetime;
     }
 
-    public Status getStatus() {
-        return status;
+    public String getStatus() {
+        return status.name();
     }
 
     public void setStatus(Status status) {

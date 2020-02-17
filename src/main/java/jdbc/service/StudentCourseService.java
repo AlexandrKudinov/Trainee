@@ -30,7 +30,6 @@ public class StudentCourseService extends Util implements StudentCourseDAO {
         }
     }
 
-
     private void addStudentCourseToList(ResultSet resultSet, List<StudentCourse> students) throws SQLException {
         while (resultSet.next()) {
             StudentCourse studentCourse = new StudentCourse();
@@ -40,8 +39,6 @@ public class StudentCourseService extends Util implements StudentCourseDAO {
             students.add(studentCourse);
         }
     }
-
-
 
     @Override
     public List<StudentCourse> getALL() throws SQLException {
@@ -59,7 +56,6 @@ public class StudentCourseService extends Util implements StudentCourseDAO {
         }
         return studentsCourses;
     }
-
 
     @Override
     public StudentCourse getByID(int id) throws SQLException {

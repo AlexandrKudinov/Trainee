@@ -3,25 +3,29 @@ package jdbc.service;
 import jdbc.bl.Util;
 import jdbc.dao.*;
 import jdbc.entity.Course;
+import jdbc.entity.Status;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CoursesService extends Util implements CourseDAO {
+public class CourseService extends Util implements CourseDAO {
     Connection connection = getConnection();
 
     @Override
     public void add(Course course) throws SQLException {
         String sql = "INSERT INTO courses ( id, title, start_datetime , " +
-                "end_datetime, teacher_id, created_at ) VALUES ( ?, ?, ?, ?, ?, ?);";
+                "end_datetime, teacher_id, created_at ,status)" +
+                " VALUES ( ?, ?, ?, ?, ?, ?, ?::course_status);";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, course.getId());
             preparedStatement.setString(2, course.getTitle());
             preparedStatement.setDate(3, course.getStartDatetime());
             preparedStatement.setDate(4, course.getEndDatetime());
-            preparedStatement.setInt(6, course.getTeacherId());
-            preparedStatement.setString(7, course.getCreatedAt());
+            preparedStatement.setInt(5, course.getTeacherId());
+            preparedStatement.setString(6, course.getCreatedAt());
+            preparedStatement.setString(7, course.getStatus());
+
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -37,10 +41,12 @@ public class CoursesService extends Util implements CourseDAO {
             Course course = new Course();
             course.setId(resultSet.getInt("id"));
             course.setTitle(resultSet.getString("title"));
-            course.setTitle(resultSet.getString("start_datetime"));
-            course.setTitle(resultSet.getString("end_datetime"));
-            course.setTitle(resultSet.getString("teacher_id"));
-            course.setTitle(resultSet.getString("created_at"));
+            course.setStartDatetime(resultSet.getDate("start_datetime"));
+            course.setEndDatetime(resultSet.getDate("end_datetime"));
+            course.setTeacherId(resultSet.getInt("teacher_id"));
+            course.setCreatedAt(resultSet.getString("created_at"));
+            Status status = Status.valueOf(resultSet.getString("status"));
+            course.setStatus(status);
             courses.add(course);
         }
     }
@@ -49,7 +55,7 @@ public class CoursesService extends Util implements CourseDAO {
     public List<Course> getALL() throws SQLException {
         List<Course> courses = new ArrayList<>();
         String sql = "SELECT id, title, start_datetime, end_datetime, status, " +
-                "  teacher_id,created_at FROM students;";
+                "  teacher_id, created_at, status FROM courses;";
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
             addCourseToList(resultSet, courses);
@@ -80,6 +86,8 @@ public class CoursesService extends Util implements CourseDAO {
                 course.setEndDatetime(resultSet.getDate("end_datetime"));
                 course.setTeacherId(resultSet.getInt("teacher_id"));
                 course.setCreatedAt(resultSet.getString("created_at"));
+                Status status = Status.valueOf(resultSet.getString("status"));
+                course.setStatus(status);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -113,7 +121,7 @@ public class CoursesService extends Util implements CourseDAO {
 
     @Override
     public void remove(Course course) throws SQLException {
-        String sql = "DELETE FROM students WHERE id=?;";
+        String sql = "DELETE FROM courses WHERE id=?;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, course.getId());
             preparedStatement.executeUpdate();
