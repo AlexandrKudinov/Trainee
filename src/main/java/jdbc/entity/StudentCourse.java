@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class StudentCourse {
     private int id;
-    private int student_id;
-    private int course_id;
+    private int studentId;
+    private int courseId;
 
     public int getId() {
         return id;
@@ -15,20 +15,20 @@ public class StudentCourse {
         this.id = id;
     }
 
-    public int getStudent_id() {
-        return student_id;
+    public int getStudentId() {
+        return studentId;
     }
 
-    public void setStudent_id(int student_id) {
-        this.student_id = student_id;
+    public void setStudentId(int studentId) {
+        this.studentId = studentId;
     }
 
-    public int getCourse_id() {
-        return course_id;
+    public int getCourseId() {
+        return courseId;
     }
 
-    public void setCourse_id(int course_id) {
-        this.course_id = course_id;
+    public void setCourseId(int courseId) {
+        this.courseId = courseId;
     }
 
     @Override
@@ -37,21 +37,21 @@ public class StudentCourse {
         if (o == null || getClass() != o.getClass()) return false;
         StudentCourse that = (StudentCourse) o;
         return id == that.id &&
-                student_id == that.student_id &&
-                course_id == that.course_id;
+                studentId == that.studentId &&
+                courseId == that.courseId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, student_id, course_id);
+        return Objects.hash(id, studentId, courseId);
     }
 
     @Override
     public String toString() {
         return "StudentCourse{" +
                 "jdbc.bl=" + id +
-                ", student_id=" + student_id +
-                ", course_id=" + course_id +
+                ", studentId=" + studentId +
+                ", courseId=" + courseId +
                 '}';
     }
 }

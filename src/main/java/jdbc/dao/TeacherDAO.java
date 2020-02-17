@@ -7,16 +7,16 @@ import java.util.List;
 
 public interface TeacherDAO {
     //CREATE
-    void add(Teacher teacher);
+    void add(Teacher teacher) throws SQLException;
 
     //READ
-    List<Teacher> getALL();
+    List<Teacher> getALL() throws SQLException;
 
     Teacher getByID(int id) throws SQLException;
 
     //UPDATE
-    void update(Teacher teacher);
+    void update(Teacher teacher) throws SQLException;
 
     //DELETE
-    void remove(Teacher teacher);
+    void remove(Teacher teacher) throws SQLException;
 }

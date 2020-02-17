@@ -1,16 +1,16 @@
 package jdbc.entity;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.Objects;
 
 public class Course {
     private int id;
-    private String name;
-    private Date start_datetime;
-    private Date end_datetime;
+    private String title;
+    private Date startDatetime;
+    private Date endDatetime;
     private Status status;
-    private int teacher_id;
-    private int created_id;
+    private int teacherId;
+    private String createdAt;
 
     public int getId() {
         return id;
@@ -20,28 +20,28 @@ public class Course {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String name) {
+        this.title = name;
     }
 
-    public Date getStart_datetime() {
-        return start_datetime;
+    public Date getStartDatetime() {
+        return startDatetime;
     }
 
-    public void setStart_datetime(Date start_datetime) {
-        this.start_datetime = start_datetime;
+    public void setStartDatetime(Date start_datetime) {
+        this.startDatetime = start_datetime;
     }
 
-    public Date getEnd_datetime() {
-        return end_datetime;
+    public Date getEndDatetime() {
+        return endDatetime;
     }
 
-    public void setEnd_datetime(Date end_datetime) {
-        this.end_datetime = end_datetime;
+    public void setEndDatetime(Date end_datetime) {
+        this.endDatetime = end_datetime;
     }
 
     public Status getStatus() {
@@ -52,20 +52,20 @@ public class Course {
         this.status = status;
     }
 
-    public int getTeacher_id() {
-        return teacher_id;
+    public int getTeacherId() {
+        return teacherId;
     }
 
-    public void setTeacher_id(int teacher_id) {
-        this.teacher_id = teacher_id;
+    public void setTeacherId(int teacherId) {
+        this.teacherId = teacherId;
     }
 
-    public int getCreated_id() {
-        return created_id;
+    public String getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreated_id(int created_id) {
-        this.created_id = created_id;
+    public void setCreatedAt(String createdId) {
+        this.createdAt = createdId;
     }
 
     @Override
@@ -74,29 +74,29 @@ public class Course {
         if (o == null || getClass() != o.getClass()) return false;
         Course course = (Course) o;
         return id == course.id &&
-                teacher_id == course.teacher_id &&
-                created_id == course.created_id &&
-                name.equals(course.name) &&
-                start_datetime.equals(course.start_datetime) &&
-                end_datetime.equals(course.end_datetime) &&
+                teacherId == course.teacherId &&
+                createdAt == course.createdAt &&
+                title.equals(course.title) &&
+                startDatetime.equals(course.startDatetime) &&
+                endDatetime.equals(course.endDatetime) &&
                 status == course.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, start_datetime, end_datetime, status, teacher_id, created_id);
+        return Objects.hash(id, title, startDatetime, endDatetime, status, teacherId, createdAt);
     }
 
     @Override
     public String toString() {
         return "Course{" +
                 "jdbc.bl=" + id +
-                ", name='" + name + '\'' +
-                ", start_datetime=" + start_datetime +
-                ", end_datetime=" + end_datetime +
+                ", title='" + title + '\'' +
+                ", start_datetime=" + startDatetime +
+                ", end_datetime=" + endDatetime +
                 ", status=" + status +
-                ", teacher_id=" + teacher_id +
-                ", created_id=" + created_id +
+                ", teacher_id=" + teacherId +
+                ", created_id=" + createdAt +
                 '}';
     }
 }
