@@ -1,16 +1,19 @@
-package jdbc.service;
+package jdbc.dao;
 
-import jdbc.bl.Util;
+import jdbc.Domain;
+import jdbc.bl.AbstractDAO;
 import jdbc.dao.*;
 import jdbc.entity.Course;
+import jdbc.entity.Person;
 import jdbc.entity.Status;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CourseService extends Util implements CourseDAO {
-    Connection connection = getConnection();
+public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
+
+    private static Connection connection = getConnection();
 
     @Override
     public void add(Course course) throws SQLException {
@@ -24,32 +27,34 @@ public class CourseService extends Util implements CourseDAO {
             preparedStatement.setDate(4, course.getEndDatetime());
             preparedStatement.setInt(5, course.getTeacherId());
             preparedStatement.setString(6, course.getCreatedAt());
-            preparedStatement.setString(7, course.getStatus());
+            preparedStatement.setString(7, course.getStatus().name());
 
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
+    }
+
+    private Course createCourse(ResultSet resultSet) throws SQLException {
+        Status status = Status.valueOf(resultSet.getString("status"));
+        Course course = Course.builder()
+                .id(resultSet.getInt("id"))
+                .title(resultSet.getString("title"))
+                .startDatetime(resultSet.getDate("start_datetime"))
+                .endDatetime(resultSet.getDate("end_datetime"))
+                .teacherId(resultSet.getInt("teacher_id"))
+                .createdAt(resultSet.getString("created_at"))
+                .status(status)
+                .build();
+        return course;
     }
 
     private void addCourseToList(ResultSet resultSet, List<Course> courses) throws SQLException {
         while (resultSet.next()) {
-            Course course = new Course();
-            course.setId(resultSet.getInt("id"));
-            course.setTitle(resultSet.getString("title"));
-            course.setStartDatetime(resultSet.getDate("start_datetime"));
-            course.setEndDatetime(resultSet.getDate("end_datetime"));
-            course.setTeacherId(resultSet.getInt("teacher_id"));
-            course.setCreatedAt(resultSet.getString("created_at"));
-            Status status = Status.valueOf(resultSet.getString("status"));
-            course.setStatus(status);
-            courses.add(course);
+            courses.add(createCourse(resultSet));
         }
     }
+
 
     @Override
     public List<Course> getALL() throws SQLException {
@@ -58,7 +63,7 @@ public class CourseService extends Util implements CourseDAO {
                 "  teacher_id, created_at, status FROM courses;";
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
-            addCourseToList(resultSet, courses);
+           addCourseToList(resultSet,courses);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -71,7 +76,7 @@ public class CourseService extends Util implements CourseDAO {
 
     @Override
     public Course getByID(int id) throws SQLException {
-        Course course = new Course();
+        Course course = null;
         String sql = "SELECT id, title, start_datetime, end_datetime, status, " +
                 "teacher_id,created_at  FROM courses WHERE id=?;";
 
@@ -80,21 +85,10 @@ public class CourseService extends Util implements CourseDAO {
 
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                course.setId(resultSet.getInt("id"));
-                course.setTitle(resultSet.getString("title"));
-                course.setStartDatetime(resultSet.getDate("start_datetime"));
-                course.setEndDatetime(resultSet.getDate("end_datetime"));
-                course.setTeacherId(resultSet.getInt("teacher_id"));
-                course.setCreatedAt(resultSet.getString("created_at"));
-                Status status = Status.valueOf(resultSet.getString("status"));
-                course.setStatus(status);
+                course = createCourse(resultSet);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
         return course;
     }
@@ -112,10 +106,6 @@ public class CourseService extends Util implements CourseDAO {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
     }
 
@@ -127,10 +117,6 @@ public class CourseService extends Util implements CourseDAO {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
     }
 }

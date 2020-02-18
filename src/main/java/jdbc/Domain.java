@@ -1,58 +1,49 @@
 package jdbc;
 
+import jdbc.bl.AbstractDAO;
+import jdbc.command.AddPerson;
+import jdbc.command.Command;
+import jdbc.command.Receiver;
+import jdbc.command.RemovePerson;
+import jdbc.dao.CourseDAOimpl;
+import jdbc.dao.PersonDAOimpl;
 import jdbc.entity.Course;
+import jdbc.entity.Person;
 import jdbc.entity.Status;
-import jdbc.entity.Student;
-import jdbc.entity.Teacher;
-import jdbc.service.CourseService;
-import jdbc.service.StudentService;
-import jdbc.service.TeacherService;
+import jdbc.entity.Type;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Calendar;
+import java.util.List;
 
-public class Domain {
+public class Domain extends AbstractDAO {
     public static void main(String[] args) {
-        StudentService studentService = new StudentService();
-        TeacherService teacherService = new TeacherService();
-        CourseService coursesService = new CourseService();
-        Student student = new Student();
-        student.setId(10);
-        student.setName("Gray");
-        Teacher teacher = new Teacher();
-        teacher.setId(4);
-        teacher.setName("Grigorovich");
-        Course course = new Course();
-        course.setId(7);
-        course.setCreatedAt("ITMO");
-        course.setTeacherId(1);
+
+        PersonDAOimpl personDAOimpl = new PersonDAOimpl();
+        CourseDAOimpl courseDAOimpl = new CourseDAOimpl();
+        Person person = Person.builder()
+                .id(5)
+                .name("Marianich")
+                .type(Type.student)
+                .build();
         Calendar calendar = Calendar.getInstance();
         calendar.set(2020, Calendar.APRIL, 10);
-        course.setEndDatetime(new java.sql.Date(calendar.getTime().getTime()));
-        Calendar calendar1 = Calendar.getInstance();
-        calendar1.set(1999, Calendar.AUGUST, 29);
-        course.setStartDatetime(new java.sql.Date(calendar1.getTime().getTime()));
-        course.setStatus(Status.open);
-        course.setTitle("Java");
+        Course course = Course.builder()
+                .id(7)
+                .title("Piano")
+                .startDatetime(new java.sql.Date(calendar.getTime().getTime()))
+                .endDatetime(new java.sql.Date(calendar.getTime().getTime()))
+                .teacherId(2)
+                .createdAt("SPbU")
+                .status(Status.on_study)
+                .build();
 
-        try {
-//            studentService.update(student);
-//            Student student1 = studentService.getByID(2);
-//            System.out.println(student1);
-//            List<String> students = studentService.getAllTeachedBy(teacher);
-//            System.out.println(students);
-//            List<Teacher> teachers = teacherService.getALL();
-//            teacherService.add(teacher);
-//            List<List<String>> teachersCourses = teacherService.assignedToWhom();
-//            System.out.println(teachersCourses);
-//            Course course = coursesService.getByID(1);
-//            coursesService.add(course);
-//            List<Course> courses = coursesService.getALL();
-//            Course course1 = coursesService.getByID(1);
-//            System.out.println(course1);
+        Receiver receiver = new Receiver(new AddPerson(person));
+        Receiver receiver1 = new Receiver(new RemovePerson(person));
 
-            coursesService.remove(course);
-
+        try (Connection connection = getConnection()) {
+           receiver.runCommand();
         } catch (SQLException e) {
             e.printStackTrace();
         }
