@@ -15,7 +15,7 @@ public class AddPerson extends AbstractDAO implements Command {
     }
 
     @Override
-    public void execute() {
+    public Object execute() {
         String tableName = person.getType().getTableName();
         String sql = "INSERT INTO " + tableName + " ( id, name ) VALUES ( ?, ?);";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -25,5 +25,6 @@ public class AddPerson extends AbstractDAO implements Command {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return person.getId();
     }
 }

@@ -7,7 +7,7 @@ public class Receiver {
         this.command=command;
     }
 
-   public void runCommand(){
-        command.execute();
+   public Object runCommand(){
+        return command.execute();
     }
 }

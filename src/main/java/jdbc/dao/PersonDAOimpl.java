@@ -43,7 +43,7 @@ public class PersonDAOimpl extends AbstractDAO implements DAO<Person> {
         }
     }
 
-    public List<String> getStudentsTeachedBy(Person person) throws SQLException {
+    public List<String> getStudentsTaughtBy(Person person) throws SQLException {
         String sql = "SELECT DISTINCT students.name FROM students " +
                 "INNER JOIN students_courses on students.id = students_courses.student_id " +
                 "INNER JOIN courses ON courses.id = students_courses.course_id WHERE courses.teacher_id = ?;";
@@ -58,14 +58,9 @@ public class PersonDAOimpl extends AbstractDAO implements DAO<Person> {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
         return students;
     }
-
 
     @Override
     public List<Person> getALL() throws SQLException {
@@ -80,7 +75,6 @@ public class PersonDAOimpl extends AbstractDAO implements DAO<Person> {
         }
         return persons;
     }
-
 
     @Override
     public Person getByID(int id) throws SQLException {

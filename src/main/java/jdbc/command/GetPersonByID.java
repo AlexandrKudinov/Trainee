@@ -12,7 +12,6 @@ import java.sql.SQLException;
 public class GetPersonByID extends AbstractDAO implements Command {
     private int id;
     private Type type;
-    private Person person;
     private static Connection connection = getConnection();
 
     public GetPersonByID(Type personType, int id) {
@@ -20,15 +19,11 @@ public class GetPersonByID extends AbstractDAO implements Command {
         this.type = personType;
     }
 
-    public Person getPerson() {
-        return person;
-    }
-
     @Override
-    public void execute() {
+    public Object execute() {
         String tableName = type.getTableName();
         String sql = "SELECT id, name FROM " + tableName + " WHERE id=?;";
-
+        Person person = null;
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -42,5 +37,6 @@ public class GetPersonByID extends AbstractDAO implements Command {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return person;
     }
 }

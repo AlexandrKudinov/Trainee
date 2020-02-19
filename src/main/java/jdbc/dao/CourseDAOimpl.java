@@ -16,7 +16,7 @@ public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
     private static Connection connection = getConnection();
 
     @Override
-    public void add(Course course) throws SQLException {
+    public void add(Course course) {
         String sql = "INSERT INTO courses ( id, title, start_datetime , " +
                 "end_datetime, teacher_id, created_at ,status)" +
                 " VALUES ( ?, ?, ?, ?, ?, ?, ?::course_status);";
@@ -35,7 +35,7 @@ public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
         }
     }
 
-    private Course createCourse(ResultSet resultSet) throws SQLException {
+    public static Course createCourse(ResultSet resultSet) throws SQLException {
         Status status = Status.valueOf(resultSet.getString("status"));
         Course course = Course.builder()
                 .id(resultSet.getInt("id"))
@@ -75,7 +75,7 @@ public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
     }
 
     @Override
-    public Course getByID(int id) throws SQLException {
+    public Course getByID(int id) {
         Course course = null;
         String sql = "SELECT id, title, start_datetime, end_datetime, status, " +
                 "teacher_id,created_at  FROM courses WHERE id=?;";
@@ -94,7 +94,7 @@ public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
     }
 
     @Override
-    public void update(Course course) throws SQLException {
+    public void update(Course course) {
         String sql = "UPDATE courses SET title=? start_datetim=? end_datetime=? " +
                 "teacher_id=? created_at=? WHERE id=?;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -110,7 +110,7 @@ public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
     }
 
     @Override
-    public void remove(Course course) throws SQLException {
+    public void remove(Course course) {
         String sql = "DELETE FROM courses WHERE id=?;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, course.getId());

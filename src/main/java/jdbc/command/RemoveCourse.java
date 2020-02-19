@@ -1,31 +1,29 @@
 package jdbc.command;
 
 import jdbc.bl.AbstractDAO;
-import jdbc.entity.Person;
+import jdbc.entity.Course;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class UpdatePerson extends AbstractDAO implements Command {
-    private Person person;
+public class RemoveCourse extends AbstractDAO implements Command{
+    private int id;
     private static Connection connection = getConnection();
 
-    public UpdatePerson(Person person) {
-        this.person = person;
+    public RemoveCourse(int id){
+        this.id=id;
     }
-
     @Override
     public Object execute() {
-        String tableName = person.getType().getTableName();
-        String sql = "UPDATE " + tableName + " SET name=? WHERE id=?;";
+        String sql = "DELETE FROM courses WHERE id=?;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, person.getName());
-            preparedStatement.setInt(2, person.getId());
+            preparedStatement.setInt(1, id);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return person.getId();
+        return id;
     }
+
 }
