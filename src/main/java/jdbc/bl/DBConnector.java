@@ -67,7 +67,7 @@ public class DBConnector {
             "    6 - remove person\n " +
             "    7 - update course\n " +
             "    8 - update person\n " +
-            "    9 - request canceled\n " +
+            "    q - request canceled\n " +
             "    0 - exit";
 
     public void start() throws IOException, ParseException {

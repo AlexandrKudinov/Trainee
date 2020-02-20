@@ -43,7 +43,7 @@ public class PersonDAOimpl extends AbstractDAO implements DAO<Person> {
         }
     }
 
-    public List<String> getStudentsTaughtBy(Person person) throws SQLException {
+    public List<String> getStudentsTaughtBy(Person person) {
         String sql = "SELECT DISTINCT students.name FROM students " +
                 "INNER JOIN students_courses on students.id = students_courses.student_id " +
                 "INNER JOIN courses ON courses.id = students_courses.course_id WHERE courses.teacher_id = ?;";
@@ -63,13 +63,13 @@ public class PersonDAOimpl extends AbstractDAO implements DAO<Person> {
     }
 
     @Override
-    public List<Person> getALL() throws SQLException {
+    public List<Person> getALL() {
         List<Person> persons = new ArrayList<>();
         String tableName = type.getTableName();
-        String sql = "SELECT id, name FROM "+tableName+";";
+        String sql = "SELECT id, name FROM " + tableName + ";";
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
-           addPersonToList(resultSet,persons);
+            addPersonToList(resultSet, persons);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -77,7 +77,7 @@ public class PersonDAOimpl extends AbstractDAO implements DAO<Person> {
     }
 
     @Override
-    public Person getByID(int id) throws SQLException {
+    public Person getByID(int id) {
         Person person = null;
         String sql = "SELECT id, name FROM " + type.getTableName() + " WHERE id=?;";
 
@@ -99,7 +99,7 @@ public class PersonDAOimpl extends AbstractDAO implements DAO<Person> {
     }
 
     @Override
-    public void update(Person person) throws SQLException {
+    public void update(Person person) {
         String tableName = person.getType().getTableName();
         String sql = "UPDATE " + tableName + " SET name=? WHERE id=?;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -112,11 +112,11 @@ public class PersonDAOimpl extends AbstractDAO implements DAO<Person> {
     }
 
     @Override
-    public void remove(Person person) throws SQLException {
-        String tableName = person.getType().getTableName();
-        String sql = "DELETE FROM "+tableName+" WHERE id=?;";
+    public void remove(Integer id) {
+        String tableName = type.getTableName();
+        String sql = "DELETE FROM " + tableName + " WHERE id=?;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, person.getId());
+            preparedStatement.setInt(1, id);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
