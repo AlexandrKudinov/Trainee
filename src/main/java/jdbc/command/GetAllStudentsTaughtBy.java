@@ -6,7 +6,7 @@ import jdbc.entity.Person;
 import jdbc.entity.Type;
 
 public class GetAllStudentsTaughtBy extends AbstractDAO implements Command {
-    private PersonDAOimpl personDAOimpl = new PersonDAOimpl();
+    private PersonDAOimpl personDAOimpl = PersonDAOimpl.getInstance();
     private Person teacher;
 
     public GetAllStudentsTaughtBy(Person person){

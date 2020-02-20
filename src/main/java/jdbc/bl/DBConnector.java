@@ -130,7 +130,6 @@ public class DBConnector {
         receiver = new Receiver(new RemoveCourse(courseId));
         receiver.runCommand();
         System.out.println("Course " + courseId + " removed successfully");
-
     }
 
     void runRemovePerson() throws IOException {
@@ -139,7 +138,6 @@ public class DBConnector {
         receiver = new Receiver(new RemovePerson(personType, personId));
         receiver.runCommand();
         System.out.println("Person " + personId + " removed successfully");
-
     }
 
     void runUpdateCourse() throws IOException, ParseException {
@@ -169,7 +167,6 @@ public class DBConnector {
                 courseId = Integer.valueOf(input);
             }
         }
-
         inputUnCorrect = true;
     }
 
@@ -308,7 +305,6 @@ public class DBConnector {
         inputUnCorrect = true;
     }
 
-
     private void getPerson() throws IOException {
         System.out.println(" Enter the person columns: ");
         checkPersonType();
@@ -323,7 +319,6 @@ public class DBConnector {
                 .id(personId)
                 .name(personName)
                 .build();
-
     }
 
     private void checkPersonType() throws IOException {

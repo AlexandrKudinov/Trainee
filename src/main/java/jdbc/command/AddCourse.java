@@ -5,7 +5,7 @@ import jdbc.dao.CourseDAOimpl;
 import jdbc.entity.Course;
 
 public class AddCourse extends AbstractDAO implements Command {
-    private CourseDAOimpl courseDAOimpl = new CourseDAOimpl();
+    private CourseDAOimpl courseDAOimpl = CourseDAOimpl.getInstance();
     private Course course;
 
     public AddCourse(Course course) {

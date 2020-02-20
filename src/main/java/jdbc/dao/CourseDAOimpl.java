@@ -9,8 +9,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
-
     private static Connection connection = getConnection();
+    private static volatile CourseDAOimpl INSTANCE;
+
+    private CourseDAOimpl() {
+    }
+
+    public static CourseDAOimpl getInstance() {
+        CourseDAOimpl courseDAOimpl = INSTANCE;
+        if (courseDAOimpl == null) {
+            synchronized (CourseDAOimpl.class) {
+                courseDAOimpl = INSTANCE = new CourseDAOimpl();
+
+            }
+        }
+        return courseDAOimpl;
+    }
 
     @Override
     public void add(Course course) {

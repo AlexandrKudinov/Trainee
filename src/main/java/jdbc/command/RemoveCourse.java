@@ -4,7 +4,7 @@ import jdbc.bl.AbstractDAO;
 import jdbc.dao.CourseDAOimpl;
 
 public class RemoveCourse extends AbstractDAO implements Command{
-    private CourseDAOimpl courseDAOimpl = new CourseDAOimpl();
+    private CourseDAOimpl courseDAOimpl = CourseDAOimpl.getInstance();
     private int id;
 
     public RemoveCourse(int id){

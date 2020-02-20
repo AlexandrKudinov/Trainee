@@ -9,9 +9,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PersonDAOimpl extends AbstractDAO implements DAO<Person> {
-
     private Connection connection = getConnection();
     private Type type;
+
+    private static volatile PersonDAOimpl INSTANCE;
+
+    private PersonDAOimpl() {
+    }
+
+    public static PersonDAOimpl getInstance() {
+        PersonDAOimpl personDAOimpl = INSTANCE;
+        if (personDAOimpl == null) {
+            synchronized (PersonDAOimpl.class) {
+                personDAOimpl = INSTANCE = new PersonDAOimpl();
+            }
+        }
+        return personDAOimpl;
+    }
+
 
     public void setType(Type type) {
         this.type = type;

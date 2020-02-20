@@ -6,7 +6,7 @@ import jdbc.entity.Course;
 
 
 public class UpdateCourse extends AbstractDAO implements Command {
-    private CourseDAOimpl courseDAOimpl = new CourseDAOimpl();
+    private CourseDAOimpl courseDAOimpl = CourseDAOimpl.getInstance();
     private Course course;
 
     public UpdateCourse(Course course) {

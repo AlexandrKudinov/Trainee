@@ -4,7 +4,7 @@ import jdbc.bl.AbstractDAO;
 import jdbc.dao.CourseDAOimpl;
 
 public class GetCourseByID extends AbstractDAO implements Command {
-    private CourseDAOimpl courseDAOimpl = new CourseDAOimpl();
+    private CourseDAOimpl courseDAOimpl = CourseDAOimpl.getInstance();
     private int id;
 
     public GetCourseByID(int id){

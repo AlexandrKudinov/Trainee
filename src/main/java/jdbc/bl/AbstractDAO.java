@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public abstract class AbstractDAO {
-   // private static String DB_DRIVER;
     private static String DB_URL;
     private static String DB_USERNAME;
     private static String DB_PASSWORD;
@@ -52,11 +51,6 @@ public abstract class AbstractDAO {
 
 
     private static class PropertyManager {
-
-        private String getDriver() throws IOException {
-            return readProperty("DB_DRIVER");
-        }
-
         private String getUrl() throws IOException {
             return readProperty("DB_URL");
         }
@@ -77,24 +71,4 @@ public abstract class AbstractDAO {
             return properties.getProperty(name);
         }
     }
-
-
-//    public static Connection getConnection() {
-//        if (connection == null) {
-//            propertyManager = new PropertyManager();
-//            try {
-//                DB_DRIVER = propertyManager.getDriver();
-//                DB_URL = propertyManager.getUrl();
-//                DB_USERNAME = propertyManager.getUsername();
-//                DB_PASSWORD = propertyManager.getPassword();
-//                Class.forName(DB_DRIVER);
-//                connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
-//                System.out.println("Connection OK");
-//            } catch (ClassNotFoundException | SQLException | IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        return connection;
-//    }
-
 }
