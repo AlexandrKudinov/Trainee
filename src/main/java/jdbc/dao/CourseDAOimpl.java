@@ -67,7 +67,7 @@ public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
     }
 
     @Override
-    public List<Course> getALL() throws SQLException {
+    public List<Course> getALL() {
         List<Course> courses = new ArrayList<>();
         String sql = "SELECT id, title, start_datetime, end_datetime, status, " +
                 "  teacher_id, created_at, status FROM courses;";
@@ -76,10 +76,6 @@ public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
             addCourseToList(resultSet, courses);
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
         return courses;
     }

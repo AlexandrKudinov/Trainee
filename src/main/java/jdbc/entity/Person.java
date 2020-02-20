@@ -1,16 +1,16 @@
 package jdbc.entity;
 
-import lombok.Builder;
+
 import lombok.NonNull;
 import lombok.Value;
+import lombok.experimental.SuperBuilder;
 
 @Value
-@Builder
-public class Person {
+@SuperBuilder
+public class Person extends Entity {
     @NonNull
     private Type type;
-    @NonNull
-    private int id;
+
     @NonNull
     private String name;
 }

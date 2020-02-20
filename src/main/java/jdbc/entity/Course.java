@@ -3,14 +3,13 @@ package jdbc.entity;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.experimental.SuperBuilder;
 
 import java.sql.Date;
 
 @Value
-@Builder
-public class Course {
-    @NonNull
-    private int id;
+@SuperBuilder
+public class Course extends Entity {
     @NonNull
     private String title;
     @NonNull
@@ -23,4 +22,6 @@ public class Course {
     private int teacherId;
     @NonNull
     private String createdAt;
+
+
 }

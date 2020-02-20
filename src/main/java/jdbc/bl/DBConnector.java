@@ -2,10 +2,9 @@ package jdbc.bl;
 
 import jdbc.command.*;
 
-import jdbc.entity.Course;
-import jdbc.entity.Person;
-import jdbc.entity.Status;
-import jdbc.entity.Type;
+import jdbc.dao.Container;
+import jdbc.dao.DAO;
+import jdbc.entity.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,6 +37,9 @@ public class DBConnector {
     private String input;
     private BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     private Receiver receiver;
+    private Command command;
+    private DAO courseDAOimpl = Container.getCourseDAOimpl();
+    private DAO personDAOimpl = Container.getPersonDAOimpl();
 
     private static volatile DBConnector INSTANCE;
 
@@ -92,8 +94,8 @@ public class DBConnector {
             requestCanceled = false;
             return;
         }
-        receiver = new Receiver(new AddCourse(course));
-        receiver.runCommand();
+        command = new Add(courseDAOimpl, course);
+        runReceiver();
         System.out.println("Course " + courseId + " added");
     }
 
@@ -103,14 +105,16 @@ public class DBConnector {
             requestCanceled = false;
             return;
         }
-        receiver = new Receiver(new AddPerson(person));
-        receiver.runCommand();
+        setPersonType(personType);
+        command = new Add(personDAOimpl, person);
+        runReceiver();
         System.out.println("Person " + personId + " added");
     }
 
     void runGetCourseByID() throws IOException {
         checkCourseID();
-        receiver = new Receiver(new GetCourseByID(courseId));
+        command = new GetByID(courseDAOimpl, courseId);
+        receiver = new Receiver(command);
         Course course = (Course) receiver.runCommand();
         System.out.println("Required course:");
         System.out.println(course.toString());
@@ -119,7 +123,9 @@ public class DBConnector {
     void runGetPersonByID() throws IOException {
         checkPersonType();
         checkPersonID();
-        receiver = new Receiver(new GetPersonByID(personType, personId));
+        setPersonType(personType);
+        command = new GetByID(personDAOimpl, personId);
+        receiver = new Receiver(command);
         Person person = (Person) receiver.runCommand();
         System.out.println("Required person:");
         System.out.println(person.toString());
@@ -127,33 +133,42 @@ public class DBConnector {
 
     void runRemoveCourse() throws IOException {
         checkCourseID();
-        receiver = new Receiver(new RemoveCourse(courseId));
-        receiver.runCommand();
+        command = new Remove(courseDAOimpl, courseId);
+        runReceiver();
         System.out.println("Course " + courseId + " removed successfully");
     }
 
     void runRemovePerson() throws IOException {
         checkPersonType();
         checkPersonID();
-        receiver = new Receiver(new RemovePerson(personType, personId));
-        receiver.runCommand();
+        setPersonType(personType);
+        command = new Remove(personDAOimpl, personId);
+        runReceiver();
         System.out.println("Person " + personId + " removed successfully");
     }
 
     void runUpdateCourse() throws IOException, ParseException {
         getCourse();
-        receiver = new Receiver(new UpdateCourse(course));
-        receiver.runCommand();
+        command = new Update(courseDAOimpl, course);
+        runReceiver();
         System.out.println("Course " + courseId + " updated");
     }
 
     void runUpdatePerson() throws IOException {
         getPerson();
-        receiver = new Receiver(new UpdatePerson(person));
-        receiver.runCommand();
+        command = new Update(personDAOimpl, person);
+        runReceiver();
         System.out.println("Person " + personId + " updated");
     }
 
+    private void runReceiver() {
+        receiver = new Receiver(command);
+        receiver.runCommand();
+    }
+
+    private void setPersonType(Type personType) {
+        Container.getPersonDAOimpl().setType(personType);
+    }
 
     private void checkCourseID() throws IOException {
         if (requestCanceled) {
@@ -256,7 +271,7 @@ public class DBConnector {
                 try {
                     status = Status.valueOf(input);
                     inputUnCorrect = false;
-                }catch (IllegalArgumentException e){
+                } catch (IllegalArgumentException e) {
                     System.out.println("wrong status!");
                 }
             }
@@ -319,6 +334,7 @@ public class DBConnector {
                 .id(personId)
                 .name(personName)
                 .build();
+
     }
 
     private void checkPersonType() throws IOException {
@@ -335,7 +351,7 @@ public class DBConnector {
                 try {
                     personType = Type.valueOf(input);
                     inputUnCorrect = false;
-                }catch (IllegalArgumentException e){
+                } catch (IllegalArgumentException e) {
                     System.out.println("wrong person type!");
                 }
             }

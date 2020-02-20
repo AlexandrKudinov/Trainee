@@ -1,17 +1,16 @@
 package jdbc.dao;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public interface DAO<T> {
 
-    void add(T t) throws SQLException;
+    void add(T t);
 
-    List<T> getALL() throws SQLException;
+    List<T> getALL() ;
 
-    T getByID(int id) throws SQLException;
+    T getByID(int id);
 
-    void update(T t) throws SQLException;
+    void update(T t);
 
-    void remove(Integer id) throws SQLException;
+    void remove(Integer id) ;
 }
