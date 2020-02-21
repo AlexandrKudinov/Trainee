@@ -15,7 +15,7 @@ public class GetByID extends AbstractDAO implements Command {
     }
 
     @Override
-    public Entity execute() {
+    public String execute() {
         return dao.getByID(id);
     }
 }

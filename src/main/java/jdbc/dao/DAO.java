@@ -4,13 +4,13 @@ import java.util.List;
 
 public interface DAO<T> {
 
-    void add(T t);
+    String add(T t);
 
-    List<T> getALL() ;
+    String getALL() ;
 
-    T getByID(int id);
+    String getByID(Integer id);
 
-    void update(T t);
+    String update(T t);
 
-    void remove(Integer id) ;
+    String remove(Integer id) ;
 }

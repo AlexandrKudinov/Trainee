@@ -14,8 +14,7 @@ public class Update extends AbstractDAO implements Command {
     }
 
     @Override
-    public Entity execute() {
-        dao.update(entity);
-        return entity;
+    public String execute() {
+       return dao.update(entity);
     }
 }

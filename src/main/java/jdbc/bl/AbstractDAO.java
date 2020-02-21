@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 import java.util.Properties;
 
-public abstract class AbstractDAO {
+public class AbstractDAO {
     private static String DB_URL;
     private static String DB_USERNAME;
     private static String DB_PASSWORD;
@@ -32,9 +32,6 @@ public abstract class AbstractDAO {
         config.setJdbcUrl(DB_URL);
         config.setUsername(DB_USERNAME);
         config.setPassword(DB_PASSWORD);
-        config.addDataSourceProperty("cachePrepStmts", "true");
-        config.addDataSourceProperty("prepStmtCacheSize", "250");
-        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
         ds = new HikariDataSource(config);
     }
 
@@ -48,7 +45,6 @@ public abstract class AbstractDAO {
         }
         return connection;
     }
-
 
     private static class PropertyManager {
         private String getUrl() throws IOException {

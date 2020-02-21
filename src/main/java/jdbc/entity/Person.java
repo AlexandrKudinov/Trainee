@@ -1,6 +1,5 @@
 package jdbc.entity;
 
-
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.SuperBuilder;

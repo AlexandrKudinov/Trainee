@@ -12,28 +12,12 @@ public class PersonDAOimpl extends AbstractDAO implements DAO<Person> {
     private Connection connection = getConnection();
     private Type type;
 
-    private static volatile PersonDAOimpl INSTANCE;
-
-    private PersonDAOimpl() {
-    }
-
-    public static PersonDAOimpl getInstance() {
-        PersonDAOimpl personDAOimpl = INSTANCE;
-        if (personDAOimpl == null) {
-            synchronized (PersonDAOimpl.class) {
-                personDAOimpl = INSTANCE = new PersonDAOimpl();
-            }
-        }
-        return personDAOimpl;
-    }
-
-
     public void setType(Type type) {
         this.type = type;
     }
 
     @Override
-    public void add(Person person) {
+    public String add(Person person) {
         String tableName = person.getType().getTableName();
 
         String sql = "INSERT INTO " + tableName + " ( id, name ) VALUES ( ?, ?);";
@@ -45,6 +29,7 @@ public class PersonDAOimpl extends AbstractDAO implements DAO<Person> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return type.name()+" "+person.getId()+" removed";
     }
 
     private void addPersonToList(ResultSet resultSet, List<Person> persons) throws SQLException {
@@ -58,27 +43,9 @@ public class PersonDAOimpl extends AbstractDAO implements DAO<Person> {
         }
     }
 
-    public List<String> getStudentsTaughtBy(Person person) {
-        String sql = "SELECT DISTINCT students.name FROM students " +
-                "INNER JOIN students_courses on students.id = students_courses.student_id " +
-                "INNER JOIN courses ON courses.id = students_courses.course_id WHERE courses.teacher_id = ?;";
-        List<String> students = new ArrayList<>();
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, person.getId());
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                String name = resultSet.getString("name");
-                students.add(name);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return students;
-    }
 
     @Override
-    public List<Person> getALL() {
+    public String getALL() {
         List<Person> persons = new ArrayList<>();
         String tableName = type.getTableName();
         String sql = "SELECT id, name FROM " + tableName + ";";
@@ -88,11 +55,11 @@ public class PersonDAOimpl extends AbstractDAO implements DAO<Person> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return persons;
+        return persons.toString();
     }
 
     @Override
-    public Person getByID(int id) {
+    public String getByID(Integer id) {
         Person person = null;
         String sql = "SELECT id, name FROM " + type.getTableName() + " WHERE id=?;";
 
@@ -110,11 +77,11 @@ public class PersonDAOimpl extends AbstractDAO implements DAO<Person> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return person;
+        return person.toString();
     }
 
     @Override
-    public void update(Person person) {
+    public String update(Person person) {
         String tableName = person.getType().getTableName();
         String sql = "UPDATE " + tableName + " SET name=? WHERE id=?;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -124,10 +91,11 @@ public class PersonDAOimpl extends AbstractDAO implements DAO<Person> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return type.name() + " " + person.getId() + " updated";
     }
 
     @Override
-    public void remove(Integer id) {
+    public String remove(Integer id) {
         String tableName = type.getTableName();
         String sql = "DELETE FROM " + tableName + " WHERE id=?;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -136,5 +104,6 @@ public class PersonDAOimpl extends AbstractDAO implements DAO<Person> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return type.name() + " " + id + " removed";
     }
 }

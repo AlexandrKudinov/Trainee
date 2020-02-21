@@ -3,7 +3,8 @@ package jdbc.bl;
 import jdbc.command.*;
 
 import jdbc.dao.Container;
-import jdbc.dao.DAO;
+import jdbc.dao.CourseDAOimpl;
+import jdbc.dao.PersonDAOimpl;
 import jdbc.entity.*;
 
 import java.io.BufferedReader;
@@ -18,28 +19,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class DBConnector {
-
-    private Course course;
-    private Person person;
-    private Type personType;
-    private int personId;
-    private String personName;
-    private int courseId;
-    private String title;
-    private Date startDatetime;
-    private Date endDatetime;
-    private Status status;
-    private int teacherId;
-    private String createdAt;
-    private Calendar calendar;
     private boolean inputUnCorrect = true;
     private boolean requestCanceled = false;
     private String input;
     private BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    private Receiver receiver;
-    private Command command;
-    private DAO courseDAOimpl = Container.getCourseDAOimpl();
-    private DAO personDAOimpl = Container.getPersonDAOimpl();
+    private CourseDAOimpl courseDAOimpl = (CourseDAOimpl) Container.get(CourseDAOimpl.class);
+    private PersonDAOimpl personDAOimpl = (PersonDAOimpl) Container.get(PersonDAOimpl.class);
 
     private static volatile DBConnector INSTANCE;
 
@@ -51,13 +36,12 @@ public class DBConnector {
         if (dbConnector == null) {
             synchronized (DBConnector.class) {
                 dbConnector = INSTANCE = new DBConnector();
-
             }
         }
         return dbConnector;
     }
 
-    private String instruction = "\n !!!! WELCOME TO DB CONNECTOR !!!!\n " +
+    public static String instruction = "\n !!!! WELCOME TO DB CONNECTOR !!!!\n " +
             "INSTRUCTION: \n " +
             "-input number of command and 'enter' to call\n" +
             " ******* commands numbers **********\n " +
@@ -72,138 +56,139 @@ public class DBConnector {
             "    q - request canceled\n " +
             "    0 - exit";
 
-    public void start() throws IOException, ParseException {
+    public void start() throws IOException {
         System.out.println(instruction);
         while (true) {
             System.out.println("enter the command:");
             input = br.readLine();
-            assert input != null;
-            try {
-                int integer = Integer.valueOf(input);
-                CommandType commandType = CommandType.valueOf(integer);
-                commandType.action();
-            } catch (NumberFormatException | NullPointerException e) {
-                System.out.println("Wrong command number!");
+            if (input != null) {
+                try {
+                    int integer = Integer.valueOf(input);
+//                    CommandType commandType = CommandType.valueOf(integer);
+//                    //  commandType.action(input);
+                    if(input.equals("1")){
+                        runAddCourse();
+                    }
+                } catch (NumberFormatException | NullPointerException e) {
+                    System.out.println("Wrong command number!");
+                }
             }
         }
     }
 
-    void runAddCourse() throws IOException, ParseException {
-        getCourse();
+    void runAddCourse() {
         if (requestCanceled) {
             requestCanceled = false;
             return;
         }
-        command = new Add(courseDAOimpl, course);
-        runReceiver();
-        System.out.println("Course " + courseId + " added");
+        runReceiver(new Add(courseDAOimpl, getCourse()));
+        System.out.println("Course added");
     }
 
-    void runAddPerson() throws IOException {
-        getPerson();
+    void runAddPerson() {
         if (requestCanceled) {
             requestCanceled = false;
             return;
         }
-        setPersonType(personType);
-        command = new Add(personDAOimpl, person);
-        runReceiver();
-        System.out.println("Person " + personId + " added");
+        runReceiver(new Add(personDAOimpl, getPerson()));
+        System.out.println("Person added");
     }
 
-    void runGetCourseByID() throws IOException {
-        checkCourseID();
-        command = new GetByID(courseDAOimpl, courseId);
-        receiver = new Receiver(command);
+    void runGetCourseByID() {
+        Receiver receiver = new Receiver(new GetByID(courseDAOimpl, checkCourseID()));
         Course course = (Course) receiver.runCommand();
         System.out.println("Required course:");
         System.out.println(course.toString());
     }
 
-    void runGetPersonByID() throws IOException {
-        checkPersonType();
-        checkPersonID();
-        setPersonType(personType);
-        command = new GetByID(personDAOimpl, personId);
-        receiver = new Receiver(command);
+    void runGetPersonByID() {
+        try {
+            setPersonType(checkPersonType());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Receiver receiver = new Receiver(new GetByID(personDAOimpl, checkPersonID()));
         Person person = (Person) receiver.runCommand();
         System.out.println("Required person:");
         System.out.println(person.toString());
     }
 
-    void runRemoveCourse() throws IOException {
-        checkCourseID();
-        command = new Remove(courseDAOimpl, courseId);
-        runReceiver();
-        System.out.println("Course " + courseId + " removed successfully");
+    void runRemoveCourse() {
+        runReceiver(new Remove(courseDAOimpl, checkCourseID()));
+        System.out.println("Course  removed successfully");
     }
 
-    void runRemovePerson() throws IOException {
-        checkPersonType();
-        checkPersonID();
-        setPersonType(personType);
-        command = new Remove(personDAOimpl, personId);
-        runReceiver();
-        System.out.println("Person " + personId + " removed successfully");
+    void runRemovePerson() {
+        try {
+            setPersonType(checkPersonType());
+            runReceiver(new Remove(personDAOimpl, checkPersonID()));
+            System.out.println("Person  removed successfully");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    void runUpdateCourse() throws IOException, ParseException {
-        getCourse();
-        command = new Update(courseDAOimpl, course);
-        runReceiver();
-        System.out.println("Course " + courseId + " updated");
+    void runUpdateCourse() {
+        runReceiver(new Update(courseDAOimpl, getCourse()));
+        System.out.println("Course  updated");
     }
 
-    void runUpdatePerson() throws IOException {
-        getPerson();
-        command = new Update(personDAOimpl, person);
-        runReceiver();
-        System.out.println("Person " + personId + " updated");
+    void runUpdatePerson() {
+        runReceiver(new Update(personDAOimpl, getPerson()));
+        System.out.println("Person updated");
     }
 
-    private void runReceiver() {
-        receiver = new Receiver(command);
+    private void runReceiver(Command command) {
+        Receiver receiver = new Receiver(command);
         receiver.runCommand();
     }
 
     private void setPersonType(Type personType) {
-        Container.getPersonDAOimpl().setType(personType);
+        personDAOimpl.setType(personType);
     }
 
-    private void checkCourseID() throws IOException {
+    private Integer checkCourseID() {
+        Integer courseId = null;
         if (requestCanceled) {
-            return;
+            return null;
         }
         while (inputUnCorrect) {
             System.out.println(" Enter id (int):");
-            input = br.readLine();
+            try {
+                input = br.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             if (input.matches("\\d+")) {
                 inputUnCorrect = false;
                 courseId = Integer.valueOf(input);
             }
         }
         inputUnCorrect = true;
+        return courseId;
     }
 
-    private void checkTitle() throws IOException {
+    private String checkTitle() throws IOException {
+        String title = null;
         if (requestCanceled) {
-            return;
+            return null;
         }
         while (inputUnCorrect) {
             System.out.println(" Enter the course title (String):");
             input = br.readLine();
             if (callRequestCancel()) {
-                return;
+                return null;
             }
             title = checkInputString();
         }
         inputUnCorrect = true;
+        return title;
     }
 
     private Calendar getCalendar(String inputDate) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         java.util.Date date = sdf.parse(inputDate);
-        calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         return calendar;
     }
@@ -212,7 +197,7 @@ public class DBConnector {
         Date datetime = null;
         if (input.matches("\\d{1,2}-\\d{1,2}-\\d{4}")) {
             Calendar calendar = getCalendar(input);
-            datetime = new java.sql.Date(calendar.getTime().getTime());
+            datetime = new Date(calendar.getTime().getTime());
             inputUnCorrect = false;
         }
         return datetime;
@@ -227,45 +212,50 @@ public class DBConnector {
         return false;
     }
 
-    private void checkStartDatetime() throws IOException, ParseException {
+    private Date checkStartDatetime() throws IOException, ParseException {
+        Date startDatetime = null;
         if (requestCanceled) {
-            return;
+            return null;
         }
         while (inputUnCorrect) {
             System.out.println(" Enter the course startDatetime (dd-MM-yyyy):");
             input = br.readLine();
             if (callRequestCancel()) {
-                return;
+                return null;
             }
             startDatetime = getDataTime();
         }
         inputUnCorrect = true;
+        return startDatetime;
     }
 
-    private void checkEndDatetime() throws IOException, ParseException {
+    private Date checkEndDatetime() throws IOException, ParseException {
+        Date endDatetime = null;
         if (requestCanceled) {
-            return;
+            return null;
         }
         while (inputUnCorrect) {
             System.out.println(" Enter the course endDatetime (dd-MM-yyyy):");
             input = br.readLine();
             if (callRequestCancel()) {
-                return;
+                return null;
             }
             endDatetime = getDataTime();
         }
         inputUnCorrect = true;
+        return endDatetime;
     }
 
-    private void checkStatus() throws IOException {
+    private Status checkStatus() throws IOException {
+        Status status = null;
         if (requestCanceled) {
-            return;
+            return null;
         }
         while (inputUnCorrect) {
             System.out.println(" Enter the course status (open, on_study, studied, rejected):");
             input = br.readLine();
             if (callRequestCancel()) {
-                return;
+                return null;
             }
             if (input.matches("\\D+")) {
                 try {
@@ -277,17 +267,19 @@ public class DBConnector {
             }
         }
         inputUnCorrect = true;
+        return status;
     }
 
-    private void checkTeacherID() throws IOException {
+    private Integer checkTeacherID() throws IOException {
+        Integer teacherId = null;
         if (requestCanceled) {
-            return;
+            return null;
         }
         while (inputUnCorrect) {
             System.out.println(" Enter the course teacherID (int):");
             input = br.readLine();
             if (callRequestCancel()) {
-                return;
+                return null;
             }
             if (input.matches("\\d")) {
                 teacherId = Integer.valueOf(input);
@@ -295,6 +287,7 @@ public class DBConnector {
             }
         }
         inputUnCorrect = true;
+        return teacherId;
     }
 
     private String checkInputString() {
@@ -305,47 +298,51 @@ public class DBConnector {
         return null;
     }
 
-    private void checkCreatedAt() throws IOException {
+    private String checkCreatedAt() throws IOException {
+        String createdAt = null;
         if (requestCanceled) {
-            return;
+            return null;
         }
         while (inputUnCorrect) {
             System.out.println(" Enter the course createdAt (String):");
             input = br.readLine();
             if (callRequestCancel()) {
-                return;
+                return null;
             }
             createdAt = checkInputString();
         }
         inputUnCorrect = true;
+        return createdAt;
     }
 
-    private void getPerson() throws IOException {
+    private Person getPerson() {
         System.out.println(" Enter the person columns: ");
-        checkPersonType();
-        checkPersonID();
-        checkPersonName();
 
         if (requestCanceled) {
-            return;
+            return null;
         }
-        person = Person.builder()
-                .type(personType)
-                .id(personId)
-                .name(personName)
-                .build();
-
+        try {
+            return Person.builder()
+                    .type(checkPersonType())
+                    .id(checkPersonID())
+                    .name(checkPersonName())
+                    .build();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        throw new IllegalArgumentException();
     }
 
-    private void checkPersonType() throws IOException {
+    private Type checkPersonType() throws IOException {
+        Type personType = null;
         if (requestCanceled) {
-            return;
+            return null;
         }
         while (inputUnCorrect) {
             System.out.println(" Enter the person type ( teacher , student ):");
             input = br.readLine();
             if (callRequestCancel()) {
-                return;
+                return null;
             }
             if (input.matches("\\D+")) {
                 try {
@@ -357,17 +354,23 @@ public class DBConnector {
             }
         }
         inputUnCorrect = true;
+        return personType;
     }
 
-    private void checkPersonID() throws IOException {
+    private Integer checkPersonID() {
+        Integer personId = null;
         if (requestCanceled) {
-            return;
+            return null;
         }
         while (inputUnCorrect) {
             System.out.println(" Enter id (int):");
-            input = br.readLine();
+            try {
+                input = br.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             if (callRequestCancel()) {
-                return;
+                return null;
             }
             if (input.matches("\\d+")) {
                 inputUnCorrect = false;
@@ -375,45 +378,47 @@ public class DBConnector {
             }
         }
         inputUnCorrect = true;
+        return personId;
     }
 
-    private void checkPersonName() throws IOException {
+    private String checkPersonName() throws IOException {
+        String personName = null;
         if (requestCanceled) {
-            return;
+            return null;
         }
         while (inputUnCorrect) {
             System.out.println(" Enter the person name (String):");
             input = br.readLine();
             if (callRequestCancel()) {
-                return;
+                return null;
             }
             personName = checkInputString();
         }
         inputUnCorrect = true;
+        return personName;
     }
 
-    private void getCourse() throws IOException, ParseException {
+    private Course getCourse() {
         System.out.println(" Enter the course columns: ");
-        checkCourseID();
-        checkTitle();
-        checkStartDatetime();
-        checkEndDatetime();
-        checkStatus();
-        checkTeacherID();
-        checkCreatedAt();
         if (requestCanceled) {
-            return;
+            return null;
         }
-        course = Course.builder()
-                .id(courseId)
-                .title(title)
-                .startDatetime(startDatetime)
-                .endDatetime(endDatetime)
-                .teacherId(teacherId)
-                .createdAt(createdAt)
-                .status(status)
-                .build();
+        try {
+            return Course.builder()
+                    .id(checkCourseID())
+                    .title(checkTitle())
+                    .startDatetime(checkStartDatetime())
+                    .endDatetime(checkEndDatetime())
+                    .teacherId(checkTeacherID())
+                    .createdAt(checkCreatedAt())
+                    .status(checkStatus())
+                    .build();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        throw new IllegalArgumentException();
     }
-
 }
 

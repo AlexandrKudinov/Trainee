@@ -14,9 +14,7 @@ public class Remove extends AbstractDAO implements Command {
     }
 
     @Override
-    public Object execute() {
-        dao.remove(id);
-        return id;
+    public String execute() {
+       return dao.remove(id);
     }
-
 }

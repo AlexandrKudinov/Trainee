@@ -10,24 +10,10 @@ import java.util.List;
 
 public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
     private static Connection connection = getConnection();
-    private static volatile CourseDAOimpl INSTANCE;
-
-    private CourseDAOimpl() {
-    }
-
-    public static CourseDAOimpl getInstance() {
-        CourseDAOimpl courseDAOimpl = INSTANCE;
-        if (courseDAOimpl == null) {
-            synchronized (CourseDAOimpl.class) {
-                courseDAOimpl = INSTANCE = new CourseDAOimpl();
-
-            }
-        }
-        return courseDAOimpl;
-    }
 
     @Override
-    public void add(Course course) {
+    public String add(Course course) {
+        Connection connection = getConnection();
         String sql = "INSERT INTO courses ( id, title, start_datetime , " +
                 "end_datetime, teacher_id, created_at ,status)" +
                 " VALUES ( ?, ?, ?, ?, ?, ?, ?::course_status);";
@@ -44,6 +30,7 @@ public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return "course"+course.getId()+"added";
     }
 
     public static Course createCourse(ResultSet resultSet) throws SQLException {
@@ -67,7 +54,7 @@ public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
     }
 
     @Override
-    public List<Course> getALL() {
+    public String getALL() {
         List<Course> courses = new ArrayList<>();
         String sql = "SELECT id, title, start_datetime, end_datetime, status, " +
                 "  teacher_id, created_at, status FROM courses;";
@@ -77,11 +64,11 @@ public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return courses;
+        return courses.toString();
     }
 
     @Override
-    public Course getByID(int id) {
+    public String getByID(Integer id) {
         Course course = null;
         String sql = "SELECT id, title, start_datetime, end_datetime, status, " +
                 "teacher_id,created_at  FROM courses WHERE id=?;";
@@ -96,11 +83,11 @@ public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return course;
+        return course.toString();
     }
 
     @Override
-    public void update(Course course) {
+    public String update(Course course) {
         String sql = "UPDATE courses SET title=? ,start_datetime=?, end_datetime=?, " +
                 "teacher_id=?, created_at=?, status=?::course_status WHERE id=?;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -115,10 +102,11 @@ public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return "course "+course.getId()+"updated";
     }
 
     @Override
-    public void remove(Integer id) {
+    public String remove(Integer id) {
         String sql = "DELETE FROM courses WHERE id=?;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
@@ -126,5 +114,6 @@ public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return "course "+id+" removed";
     }
 }
