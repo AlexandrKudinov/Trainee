@@ -7,8 +7,7 @@ import jdbc.dao.PersonDAOimpl;
 import jdbc.entity.Person;
 import jdbc.entity.Status;
 import jdbc.entity.Type;
-import jdbc.service.AddService;
-import jdbc.service.Service;
+import jdbc.service.*;
 import jdbc.entity.Course;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,49 +22,63 @@ public enum CommandType {
     ADD_COURSE(1) {
         public String action(HttpServletRequest request) {
             Course course = CommandType.getCourse(request);
-            CourseDAOimpl courseDAOimpl = new CourseDAOimpl();
-            Service service = new AddService(courseDAOimpl, course);
+            Service service = new AddService(Container.get(CourseDAOimpl.class), course);
             return service.execute();
         }
     },
-    //http://localhost:8080/main?command=1&id=3333&title=mmm&createdAt=qqqq&startDateTime=11-11-1111&endDateTime=12-12-1212&teacherID=2&status=open
 
     ADD_PERSON(2) {
         public String action(HttpServletRequest request) {
             Person person = CommandType.getPerson(request);
-            PersonDAOimpl personDAOimpl = new PersonDAOimpl();
-            Service service = new AddService(personDAOimpl,person);
+            PersonDAOimpl personDAOimpl = CommandType.setPersonDAOimplType(request);
+            Service service = new AddService(personDAOimpl, person);
             return service.execute();
         }
     },
+
     GET_COURSE_BY_ID(3) {
         public String action(HttpServletRequest request) {
-            return null;
+            Integer id = Integer.valueOf(request.getParameter("id"));
+            Service service = new GetByIDService(Container.get(CourseDAOimpl.class), id);
+            return service.execute();
         }
     },
     GET_PERSON_BY_ID(4) {
         public String action(HttpServletRequest request) {
-            return null;
+            Integer id = Integer.valueOf(request.getParameter("id"));
+            PersonDAOimpl personDAOimpl = CommandType.setPersonDAOimplType(request);
+            Service service = new GetByIDService(personDAOimpl, id);
+            return service.execute();
         }
     },
     REMOVE_COURSE(5) {
         public String action(HttpServletRequest request) {
-            return null;
+            Integer id = Integer.valueOf(request.getParameter("id"));
+            Service service = new RemoveService(Container.get(CourseDAOimpl.class), id);
+            return service.execute();
         }
     },
     REMOVE_PERSON(6) {
         public String action(HttpServletRequest request) {
-            return null;
+            Integer id = Integer.valueOf(request.getParameter("id"));
+            PersonDAOimpl personDAOimpl = CommandType.setPersonDAOimplType(request);
+            Service service = new RemoveService(personDAOimpl, id);
+            return service.execute();
         }
     },
     UPDATE_COURSE(7) {
         public String action(HttpServletRequest request) {
-            return null;
+            Course course = CommandType.getCourse(request);
+            Service service = new UpdateService(Container.get(CourseDAOimpl.class), course);
+            return service.execute();
         }
     },
     UPDATE_PERSON(8) {
         public String action(HttpServletRequest request) {
-            return null;
+            Person person = CommandType.getPerson(request);
+            PersonDAOimpl personDAOimpl = CommandType.setPersonDAOimplType(request);
+            Service service = new UpdateService(personDAOimpl, person);
+            return service.execute();
         }
     },
     EXIT(0) {
@@ -126,4 +139,9 @@ public enum CommandType {
     }
 
 
+    private static PersonDAOimpl setPersonDAOimplType(HttpServletRequest request) {
+        PersonDAOimpl personDAOimpl = (PersonDAOimpl) (Container.get(PersonDAOimpl.class));
+        personDAOimpl.setType(Type.valueOf(request.getParameter("type")));
+        return personDAOimpl;
+    }
 }

@@ -1,6 +1,6 @@
 package jdbc.dao;
 
-import jdbc.bl.AbstractDAO;
+import jdbc.bl.Config;
 import jdbc.entity.Course;
 import jdbc.entity.Status;
 
@@ -8,8 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
-    private static Connection connection = getConnection();
+public class CourseDAOimpl extends Config implements DAO<Course> {
 
     @Override
     public String add(Course course) {
@@ -30,7 +29,7 @@ public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return "course"+course.getId()+"added";
+        return "course "+course.getId()+" added";
     }
 
     public static Course createCourse(ResultSet resultSet) throws SQLException {
@@ -55,6 +54,7 @@ public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
 
     @Override
     public String getALL() {
+        Connection connection = getConnection();
         List<Course> courses = new ArrayList<>();
         String sql = "SELECT id, title, start_datetime, end_datetime, status, " +
                 "  teacher_id, created_at, status FROM courses;";
@@ -69,6 +69,7 @@ public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
 
     @Override
     public String getByID(Integer id) {
+        Connection connection = getConnection();
         Course course = null;
         String sql = "SELECT id, title, start_datetime, end_datetime, status, " +
                 "teacher_id,created_at  FROM courses WHERE id=?;";
@@ -88,6 +89,7 @@ public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
 
     @Override
     public String update(Course course) {
+        Connection connection = getConnection();
         String sql = "UPDATE courses SET title=? ,start_datetime=?, end_datetime=?, " +
                 "teacher_id=?, created_at=?, status=?::course_status WHERE id=?;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -102,11 +104,12 @@ public class CourseDAOimpl extends AbstractDAO implements DAO<Course> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return "course "+course.getId()+"updated";
+        return "course "+course.getId()+" updated";
     }
 
     @Override
     public String remove(Integer id) {
+        Connection connection = getConnection();
         String sql = "DELETE FROM courses WHERE id=?;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);

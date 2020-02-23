@@ -1,6 +1,6 @@
 package jdbc.dao;
 
-import jdbc.bl.AbstractDAO;
+import jdbc.bl.Config;
 import jdbc.entity.Person;
 import jdbc.entity.Type;
 
@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PersonDAOimpl extends AbstractDAO implements DAO<Person> {
+public class PersonDAOimpl extends Config implements DAO<Person> {
     private Connection connection = getConnection();
     private Type type;
 
@@ -29,7 +29,7 @@ public class PersonDAOimpl extends AbstractDAO implements DAO<Person> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return type.name()+" "+person.getId()+" removed";
+        return type.name()+" "+person.getId()+" added";
     }
 
     private void addPersonToList(ResultSet resultSet, List<Person> persons) throws SQLException {

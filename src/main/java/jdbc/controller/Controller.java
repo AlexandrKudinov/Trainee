@@ -5,9 +5,8 @@ import jdbc.bl.CommandType;
 import javax.servlet.http.HttpServletRequest;
 
 public class Controller {
-    HttpServletRequest request;
-    String commandNumber;
-
+    private HttpServletRequest request;
+    private String commandNumber;
 
     public Controller(HttpServletRequest request) {
         this.request = request;
@@ -19,8 +18,4 @@ public class Controller {
         CommandType commandType = CommandType.valueOf(integer);
         return commandType.action(request);
     }
-
-
-
-
 }
