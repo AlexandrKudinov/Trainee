@@ -33,7 +33,7 @@ public class Config {
         ds = new HikariDataSource(config);
     }
 
-    public Connection getConnection() {
+   protected Connection getConnection() {
         Connection connection = null;
         try {
             connection =   ds.getConnection();

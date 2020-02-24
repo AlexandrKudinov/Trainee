@@ -1,16 +1,18 @@
 package jdbc.dao;
 
+import jdbc.entity.Entity;
+
 import java.util.List;
 
 public interface DAO<T> {
 
     String add(T t);
 
-    String getALL() ;
+    List<Entity> getALL() ;
 
-    String getByID(Integer id);
+    Entity getByID(T t);
 
     String update(T t);
 
-    String remove(Integer id) ;
+    String remove(T t) ;
 }

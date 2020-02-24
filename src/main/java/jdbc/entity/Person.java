@@ -12,4 +12,13 @@ public class Person extends Entity {
 
     @NonNull
     private String name;
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "id=" +getId()+
+                ", type=" + type +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

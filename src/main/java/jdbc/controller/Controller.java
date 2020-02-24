@@ -1,21 +1,24 @@
 package jdbc.controller;
 
-import jdbc.bl.CommandType;
-
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
 
-public class Controller {
-    private HttpServletRequest request;
-    private String commandNumber;
+public interface Controller {
+    Object runService(String serviceName);
 
-    public Controller(HttpServletRequest request) {
-        this.request = request;
-        commandNumber = request.getParameter("command");
-    }
+    void setEntity(HttpServletRequest request);
 
-    public String process() {
-        int integer = Integer.valueOf(commandNumber);
-        CommandType commandType = CommandType.valueOf(integer);
-        return commandType.action(request);
+    default String getJSON(HttpServletRequest request){
+        StringBuilder sb = new StringBuilder();
+        String line;
+        try {
+            BufferedReader reader = request.getReader();
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
     }
 }

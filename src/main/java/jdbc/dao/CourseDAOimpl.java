@@ -2,6 +2,7 @@ package jdbc.dao;
 
 import jdbc.bl.Config;
 import jdbc.entity.Course;
+import jdbc.entity.Entity;
 import jdbc.entity.Status;
 
 import java.sql.*;
@@ -19,12 +20,11 @@ public class CourseDAOimpl extends Config implements DAO<Course> {
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, course.getId());
             preparedStatement.setString(2, course.getTitle());
-            preparedStatement.setDate(3, course.getStartDatetime());
-            preparedStatement.setDate(4, course.getEndDatetime());
+            preparedStatement.setDate(3, course.getStartDateTime());
+            preparedStatement.setDate(4, course.getEndDateTime());
             preparedStatement.setInt(5, course.getTeacherId());
             preparedStatement.setString(6, course.getCreatedAt());
             preparedStatement.setString(7, course.getStatus().name());
-
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -34,28 +34,27 @@ public class CourseDAOimpl extends Config implements DAO<Course> {
 
     public static Course createCourse(ResultSet resultSet) throws SQLException {
         Status status = Status.valueOf(resultSet.getString("status"));
-        Course course = Course.builder()
+        return Course.builder()
                 .id(resultSet.getInt("id"))
                 .title(resultSet.getString("title"))
-                .startDatetime(resultSet.getDate("start_datetime"))
-                .endDatetime(resultSet.getDate("end_datetime"))
+                .startDateTime(resultSet.getDate("start_datetime"))
+                .endDateTime(resultSet.getDate("end_datetime"))
                 .teacherId(resultSet.getInt("teacher_id"))
                 .createdAt(resultSet.getString("created_at"))
                 .status(status)
                 .build();
-        return course;
     }
 
-    private void addCourseToList(ResultSet resultSet, List<Course> courses) throws SQLException {
+    private void addCourseToList(ResultSet resultSet, List<Entity> courses) throws SQLException {
         while (resultSet.next()) {
             courses.add(createCourse(resultSet));
         }
     }
 
     @Override
-    public String getALL() {
+    public List<Entity> getALL() {
         Connection connection = getConnection();
-        List<Course> courses = new ArrayList<>();
+        List<Entity> courses = new ArrayList<>();
         String sql = "SELECT id, title, start_datetime, end_datetime, status, " +
                 "  teacher_id, created_at, status FROM courses;";
         try (Statement statement = connection.createStatement()) {
@@ -64,27 +63,26 @@ public class CourseDAOimpl extends Config implements DAO<Course> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return courses.toString();
+        return courses;
     }
 
     @Override
-    public String getByID(Integer id) {
+    public Entity getByID(Course course) {
+        int id = course.getId();
         Connection connection = getConnection();
-        Course course = null;
+        Course courseFromTbl = null;
         String sql = "SELECT id, title, start_datetime, end_datetime, status, " +
                 "teacher_id,created_at  FROM courses WHERE id=?;";
-
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
-
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                course = createCourse(resultSet);
+                courseFromTbl = createCourse(resultSet);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return course.toString();
+        return courseFromTbl;
     }
 
     @Override
@@ -94,8 +92,8 @@ public class CourseDAOimpl extends Config implements DAO<Course> {
                 "teacher_id=?, created_at=?, status=?::course_status WHERE id=?;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, course.getTitle());
-            preparedStatement.setDate(2, course.getStartDatetime());
-            preparedStatement.setDate(3, course.getEndDatetime());
+            preparedStatement.setDate(2, course.getStartDateTime());
+            preparedStatement.setDate(3, course.getEndDateTime());
             preparedStatement.setInt(4, course.getTeacherId());
             preparedStatement.setString(5, course.getCreatedAt());
             preparedStatement.setString(6, course.getStatus().name());
@@ -108,7 +106,8 @@ public class CourseDAOimpl extends Config implements DAO<Course> {
     }
 
     @Override
-    public String remove(Integer id) {
+    public String remove(Course course) {
+        int id = course.getId();
         Connection connection = getConnection();
         String sql = "DELETE FROM courses WHERE id=?;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {

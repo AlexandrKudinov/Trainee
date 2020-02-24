@@ -5,15 +5,16 @@ import jdbc.entity.Entity;
 
 public class RemoveService implements Service  {
     private DAO<Entity> dao;
-    private Integer id;
+    private Entity entity;
 
-    public RemoveService(DAO  dao, int id) {
+    public RemoveService(DAO dao, Entity entity) {
         this.dao = dao;
-        this.id = id;
+        this.entity = entity;
     }
 
     @Override
     public String execute() {
-        return dao.remove(id);
+        return dao.remove(entity);
     }
+
 }

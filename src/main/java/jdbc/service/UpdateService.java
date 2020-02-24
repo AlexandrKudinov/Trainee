@@ -3,7 +3,7 @@ package jdbc.service;
 import jdbc.dao.DAO;
 import jdbc.entity.Entity;
 
-public class UpdateService implements Service  {
+public class UpdateService implements Service {
     private Entity entity;
     private DAO<Entity> dao;
 
@@ -16,4 +16,5 @@ public class UpdateService implements Service  {
     public String execute() {
         return dao.update(entity);
     }
+
 }

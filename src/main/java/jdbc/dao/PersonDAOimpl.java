@@ -1,6 +1,7 @@
 package jdbc.dao;
 
 import jdbc.bl.Config;
+import jdbc.entity.Entity;
 import jdbc.entity.Person;
 import jdbc.entity.Type;
 
@@ -19,9 +20,7 @@ public class PersonDAOimpl extends Config implements DAO<Person> {
     @Override
     public String add(Person person) {
         String tableName = person.getType().getTableName();
-
         String sql = "INSERT INTO " + tableName + " ( id, name ) VALUES ( ?, ?);";
-
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, person.getId());
             preparedStatement.setString(2, person.getName());
@@ -32,7 +31,7 @@ public class PersonDAOimpl extends Config implements DAO<Person> {
         return type.name()+" "+person.getId()+" added";
     }
 
-    private void addPersonToList(ResultSet resultSet, List<Person> persons) throws SQLException {
+    private void addPersonToList(ResultSet resultSet, List<Entity> persons) throws SQLException {
         while (resultSet.next()) {
             Person person = Person.builder()
                     .id(resultSet.getInt("id"))
@@ -43,10 +42,9 @@ public class PersonDAOimpl extends Config implements DAO<Person> {
         }
     }
 
-
     @Override
-    public String getALL() {
-        List<Person> persons = new ArrayList<>();
+    public List<Entity> getALL() {
+        List<Entity> persons = new ArrayList<>();
         String tableName = type.getTableName();
         String sql = "SELECT id, name FROM " + tableName + ";";
         try (Statement statement = connection.createStatement()) {
@@ -55,20 +53,19 @@ public class PersonDAOimpl extends Config implements DAO<Person> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return persons.toString();
+        return persons;
     }
 
     @Override
-    public String getByID(Integer id) {
-        Person person = null;
+    public Entity getByID(Person person) {
+        int id = person.getId();
+        Person personFromTbl = null;
         String sql = "SELECT id, name FROM " + type.getTableName() + " WHERE id=?;";
-
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
-
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                person = Person.builder()
+                personFromTbl = Person.builder()
                         .id(resultSet.getInt("id"))
                         .name(resultSet.getString("name"))
                         .type(type)
@@ -77,7 +74,7 @@ public class PersonDAOimpl extends Config implements DAO<Person> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return person.toString();
+        return personFromTbl;
     }
 
     @Override
@@ -95,7 +92,8 @@ public class PersonDAOimpl extends Config implements DAO<Person> {
     }
 
     @Override
-    public String remove(Integer id) {
+    public String remove(Person person) {
+        int id = person.getId();
         String tableName = type.getTableName();
         String sql = "DELETE FROM " + tableName + " WHERE id=?;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {

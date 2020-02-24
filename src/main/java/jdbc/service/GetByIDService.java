@@ -4,17 +4,17 @@ import jdbc.dao.DAO;
 import jdbc.entity.Entity;
 
 public class GetByIDService implements Service  {
+    private Entity entity;
     private DAO<Entity> dao;
 
-    private int id;
-
-    public GetByIDService(DAO dao, int id){
+    public GetByIDService(DAO dao, Entity entity){
         this.dao = dao;
-        this.id = id;
+        this.entity = entity;
     }
 
     @Override
-    public String execute() {
-        return dao.getByID(id);
+    public Entity execute() {
+        return dao.getByID(entity);
     }
+
 }
