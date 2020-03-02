@@ -7,11 +7,19 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Multiplier {
     private static String readFromPath = "src/main/resources/in.txt";
     private static String writeToPath = "src/main/resources/out.txt";
+    private static Integer processorsNumber;
+    private static List<BigInteger> integers;
+
+    static {
+        processorsNumber = Runtime.getRuntime().availableProcessors();
+        integers = getListFromFile();
+    }
 
     public static void main(String[] args) {
         long startOne = System.currentTimeMillis();
@@ -33,13 +41,13 @@ public class Multiplier {
         }
     }
 
-    static BlockingQueue<BigInteger> getQueueFromFile() {
-        BlockingQueue<BigInteger> integers = new LinkedBlockingQueue<>();
+    private static List<BigInteger> getListFromFile() {
+        List<BigInteger> integers = new LinkedList<>();
         try {
             integers = Files.lines(Paths.get(readFromPath))
                     .flatMap(line -> Stream.of(line.split("\t")))
                     .map(BigInteger::new)
-                    .collect(Collectors.toCollection(LinkedBlockingQueue::new));
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -47,15 +55,26 @@ public class Multiplier {
     }
 
     private static BigInteger oneThreadMultiply() {
-        Queue<BigInteger> integers = getQueueFromFile();
         return integers.stream()
                 .reduce(BigInteger.ONE, BigInteger::multiply);
     }
 
     private static BigInteger manyThreadMultiply() {
-        ExecutorService service = Executors.newFixedThreadPool(4);
-        for (int i = 0; i < 4; i++) {
-            service.submit(new MultiplyThread());
+        ExecutorService service = Executors.newFixedThreadPool(processorsNumber);
+        int partitionSize = integers.size() / processorsNumber;
+
+        List<List<BigInteger>> partitions = IntStream.range(0, processorsNumber)
+                .mapToObj(i -> integers.subList(partitionSize * i, Math.min(partitionSize * i + partitionSize, integers.size())))
+                .collect(Collectors.toList());
+
+        BigInteger result = BigInteger.ONE;
+        for (List<BigInteger> bigIntegers : partitions) {
+            Future<BigInteger> future = service.submit(new MultiplyThread(bigIntegers));
+            try {
+                result = result.multiply(future.get());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
         }
         service.shutdown();
         try {
@@ -63,8 +82,7 @@ public class Multiplier {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return MultiplyThread.integers.peek();
+        return result;
     }
 
 }
-
