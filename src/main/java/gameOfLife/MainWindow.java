@@ -1,12 +1,13 @@
 package gameOfLife;
+
 import javax.swing.*;
 
 public class MainWindow extends JFrame {
 
     public MainWindow() {
-        add(new GameField());
+        add(new GameField(new Display(), new Logic()));
         pack();
-        setTitle("Life");
+        setTitle("Conway's Game of Life");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
         setLocationRelativeTo(null);
@@ -14,6 +15,6 @@ public class MainWindow extends JFrame {
     }
 
     public static void main(String[] args) {
-         new MainWindow();
+        new MainWindow();
     }
 }

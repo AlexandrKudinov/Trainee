@@ -1,76 +1,91 @@
 package gameOfLife;
 
+import java.util.List;
+
+
 public enum Location {
     DOWN {
         @Override
         public void control(int i, int j) {
-            if (i < map.length - 1 && map[i + 1][j]) {
+            if (sc.downIsLife(i, j)) {
+                surroundLife++;
+            } else if (sc.downOnBorderIsLife(i, j)) {
                 surroundLife++;
             }
         }
     }, UP {
         @Override
         public void control(int i, int j) {
-            if (i > 0 && map[i - 1][j]) {
+            if (sc.upIsLife(i, j)) {
+                surroundLife++;
+            } else if (sc.upOnBorderIsLife(i, j)) {
                 surroundLife++;
             }
         }
     }, LEFT {
         @Override
         public void control(int i, int j) {
-            if (j > 0 && map[i][j - 1]) {
+            if (sc.leftIsLife(i, j)) {
                 surroundLife++;
             }
         }
     }, RIGHT {
         @Override
         public void control(int i, int j) {
-            if (j < map[i].length - 1 && map[i][j + 1]) {
+            if (sc.rightIsLife(i, j)) {
                 surroundLife++;
             }
         }
     }, LEFT_UP {
         @Override
         public void control(int i, int j) {
-            if (i > 0 && j > 0 && map[i - 1][j - 1]) {
+            if (sc.leftUpIsLife(i, j)) {
+                surroundLife++;
+            } else if (sc.leftUpOnBorderIsLife(i, j)) {
                 surroundLife++;
             }
         }
     }, LEFT_DOWN {
         @Override
         public void control(int i, int j) {
-            if (i < map.length - 1 && j > 0 && map[i + 1][j - 1]) {
+            if (sc.leftDownIsLife(i, j)) {
+                surroundLife++;
+            } else if (sc.leftDownOnBorderIsLife(i, j)) {
                 surroundLife++;
             }
         }
     }, RIGHT_UP {
         @Override
         public void control(int i, int j) {
-            if (i > 0 && j < map[i].length - 1 && map[i - 1][j + 1]) {
+            if (sc.rightUpIsLife(i, j)) {
+                surroundLife++;
+            } else if (sc.rightUpOnBorderIsLife(i, j)) {
                 surroundLife++;
             }
         }
     }, RIGHT_DOWN {
         @Override
         public void control(int i, int j) {
-            if (i < map.length - 1 && j < map[i].length - 1 && map[i + 1][j + 1]) {
+            if (sc.rightDownIsLife(i, j)) {
+                surroundLife++;
+            } else if (sc.rightDownOnBorderIsLife(i, j)) {
                 surroundLife++;
             }
         }
     };
 
-    private static boolean[][] map;
-    private static int surroundLife = 0;
-
+    private static SurroundControl sc;
+    private static int surroundLife;
 
     public static int getSurroundLife() {
-        int result =  surroundLife;
+        int result = surroundLife;
         surroundLife = 0;
         return result;
     }
 
-    public static void setMap(boolean[][] map) {
-        Location.map = map;
+    public static void setMap(List<Boolean[][]> mapParts, int mapIndex) {
+        sc = new SurroundControl();
+        sc.setMap(mapParts, mapIndex);
     }
 
     public abstract void control(int i, int j);

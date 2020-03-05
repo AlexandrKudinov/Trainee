@@ -4,28 +4,22 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import static gameOfLife.Display.*;
-
-
 public class GameField extends JPanel {
     public static final int WIDTH = 600;
     public static final int HEIGHT = 600;
-    private int xPosition;
-    private int yPosition;
-    private Display display = new Display();
-    private Logic logic = new Logic();
+    public static final int BLOCK = 4;
+    private Display display;
+    private Logic logic;
 
-
-    public GameField() {
+    public GameField(Display display, Logic logic) {
+        this.display = display;
+        this.logic = logic;
         setFocusable(true);
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                xPosition = e.getX();
-                yPosition = e.getY();
-                System.out.println(xPosition + " , " + yPosition);
-                logic.changeMapStageByClick(xPosition, yPosition);
+                logic.setElementStage(true, e.getX(), e.getY());
                 GameField.super.repaint();
             }
 
@@ -33,31 +27,30 @@ public class GameField extends JPanel {
         addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                xPosition = e.getX();
-                yPosition = e.getY();
-                logic.changeMapStageByDragging(xPosition, yPosition);
+                logic.setElementStage(false, e.getX(), e.getY());
                 GameField.super.repaint();
             }
         });
 
         addKeyListener(new KeyAdapter() {
-            Timer timer = new Timer(1, evt -> update());
+            Timer timer = new Timer(10, evt -> update());
 
             @Override
             public void keyPressed(KeyEvent e) {
                 super.keyPressed(e);
-                int key = e.getKeyCode();
-
-                if (key == KeyEvent.VK_SPACE) {
-                    if (timer.isRunning()) {
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_SPACE: {
+                        if (timer.isRunning()) {
+                            timer.stop();
+                        } else timer.start();
+                        break;
+                    }
+                    case KeyEvent.VK_ESCAPE: {
                         timer.stop();
-                    } else timer.start();
-                } else
-
-                if (key == KeyEvent.VK_ESCAPE) {
-                    timer.stop();
-                    logic.setMap(new boolean[WIDTH / BLOCK][HEIGHT / BLOCK]);
-                    GameField.super.repaint();
+                        logic.clearMap();
+                        GameField.super.repaint();
+                        break;
+                    }
                 }
             }
         });
@@ -65,7 +58,7 @@ public class GameField extends JPanel {
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        display.showMap(g,logic.getMap());
+        display.showMap(g, logic.getMapParts());
     }
 
     private void update() {
